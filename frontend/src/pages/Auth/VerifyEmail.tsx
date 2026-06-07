@@ -1,10 +1,9 @@
-import AuthCard from "@/components/cards/AuthCard";
+import AuthShell from "./AuthShell";
 import { Button } from "@/components/ui/button";
-import { Mail } from "lucide-react";
 import { useForm } from "react-hook-form";
-import InputOTPController from "@/components/controllers/InputOTPController";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { Mail } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   resendEmailVerificationCode,
   signOut,
@@ -16,6 +15,7 @@ import {
 } from "@/zod/authSchemas";
 import { useAppDispatch } from "@/redux/store";
 import { handleApiErrors } from "@/api/functions/validation";
+import { InfoBox, OtpField } from "./AuthFields";
 
 export default function VerifyEmail() {
   const disp = useAppDispatch();
@@ -49,53 +49,59 @@ export default function VerifyEmail() {
   });
 
   return (
-    <AuthCard
-      title="Verify your email"
-      subtitle="We sent a 6-digit code to your inbox."
+    <AuthShell
+      title="Vérifiez votre e-mail"
+      subtitle="Un e-mail de confirmation a été envoyé à votre adresse."
       footer={
         <button
+          type="button"
           onClick={() => signOutMutation()}
-          className="text-primary hover:underline"
+          className="font-medium text-[#3B5BDB] hover:underline disabled:opacity-50"
           disabled={isSignOutPending}
         >
-          {isSignOutPending ? "Backing up..." : "Back to sign in"}
+          Retour à la connexion
         </button>
       }
     >
-      <div className="mb-6 flex justify-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent text-accent-foreground">
-          <Mail className="h-6 w-6" />
-        </div>
-      </div>
-      <form
-        onSubmit={form.handleSubmit((data) => verifyEmailCodeMutation(data))}
-        className="space-y-6"
-      >
-        <InputOTPController
-          control={form.control}
-          f={{
-            name: "code",
-          }}
-        />
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={isVerifyEmailCodePending}
+      <div className="space-y-5">
+        <InfoBox>
+          <div className="flex items-start gap-3">
+            <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-[#3B5BDB] shadow-sm">
+              <Mail className="h-4 w-4" />
+            </div>
+            <p>
+              Saisissez le code à 6 chiffres reçu par e-mail pour continuer.
+            </p>
+          </div>
+        </InfoBox>
+
+        <form
+          onSubmit={form.handleSubmit((data) => verifyEmailCodeMutation(data))}
+          className="space-y-5"
         >
-          {isVerifyEmailCodePending ? "Verifying..." : "Verify and continue"}
-        </Button>
-        <p className="text-center text-xs text-muted-foreground">
-          Didn't get the email?{" "}
-          <button
+          <OtpField control={form.control} name="code" label="Code de vérification" />
+
+          <Button
+            type="submit"
+            className="h-12 w-full rounded-xl bg-[#3B5BDB] text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-[#2F4AC2]"
+            disabled={isVerifyEmailCodePending}
+          >
+            {isVerifyEmailCodePending ? "Vérification..." : "Vérifier le code"}
+          </Button>
+
+          <Button
             type="button"
-            className="text-primary hover:underline"
+            variant="outline"
+            className="h-12 w-full rounded-xl border-[#3B5BDB] text-sm font-semibold text-[#3B5BDB] hover:bg-[#EEF2FF]"
             disabled={isResendEmailVerificationCodePending}
             onClick={() => resendEmailVerificationCodeMutation()}
           >
-            {isResendEmailVerificationCodePending ? "Resending..." : "Resend"}
-          </button>
-        </p>
-      </form>
-    </AuthCard>
+            {isResendEmailVerificationCodePending
+              ? "Renvoi..."
+              : "Renvoyer l'e-mail"}
+          </Button>
+        </form>
+      </div>
+    </AuthShell>
   );
 }

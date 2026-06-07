@@ -1,16 +1,16 @@
-import AuthCard from "@/components/cards/AuthCard";
+import AuthShell from "./AuthShell";
 import { Button } from "@/components/ui/button";
-import { Link, Navigate, useNavigate } from "react-router-dom";
-import InputOTPController from "@/components/controllers/InputOTPController";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { sendPasswordResetCode, verifyResetCode } from "@/api/functions/auth";
 import {
   verificationCodeSchema,
   type verificationCodeSchemaType,
 } from "@/zod/authSchemas";
-import { useMutation } from "@tanstack/react-query";
-import { sendPasswordResetCode, verifyResetCode } from "@/api/functions/auth";
 import { handleApiErrors } from "@/api/functions/validation";
+import { OtpField } from "./AuthFields";
 
 export default function VerifyResetCode() {
   const nav = useNavigate();
@@ -47,45 +47,36 @@ export default function VerifyResetCode() {
   });
 
   if (!userEmail) return <Navigate to={"/"} replace />;
+
   return (
-    <AuthCard
-      title="Enter reset code"
-      subtitle="Check your email for the 6-digit code."
+    <AuthShell
+      title="Vérification du code"
+      subtitle="Entrez le code reçu par e-mail."
       footer={
-        <Link to="/sign-in" className="text-primary hover:underline">
-          Back to sign in
-        </Link>
+        <button
+          type="button"
+          onClick={() => sendPasswordResetCodeMutation()}
+          className="font-medium text-[#3B5BDB] hover:underline disabled:opacity-50"
+          disabled={isSendPasswordResetCodePending}
+        >
+          Renvoyer le code
+        </button>
       }
     >
       <form
         onSubmit={form.handleSubmit((data) => verifyResetCodeMutation(data))}
-        className="space-y-6"
+        className="space-y-5"
       >
-        <InputOTPController
-          control={form.control}
-          f={{
-            name: "code",
-          }}
-        />
+        <OtpField control={form.control} name="code" label="Code de réinitialisation" />
+
         <Button
           type="submit"
-          className="w-full"
+          className="h-12 w-full rounded-xl bg-[#3B5BDB] text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-[#2F4AC2]"
           disabled={isVerifyResetCodePending}
         >
-          {isVerifyResetCodePending ? "Verifying..." : "Verify reset code"}
+          {isVerifyResetCodePending ? "Vérification..." : "Vérifier le code"}
         </Button>
-        <p className="text-center text-xs text-muted-foreground">
-          Didn't get the email?{" "}
-          <button
-            type="button"
-            className="text-primary hover:underline"
-            disabled={isSendPasswordResetCodePending}
-            onClick={() => sendPasswordResetCodeMutation()}
-          >
-            {isSendPasswordResetCodePending ? "Resending..." : "Resend"}
-          </button>
-        </p>
       </form>
-    </AuthCard>
+    </AuthShell>
   );
 }

@@ -1,35 +1,19 @@
 import { Link } from "react-router-dom";
-import AuthCard from "@/components/cards/AuthCard";
+import { Mail, Lock } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
-import InputController from "@/components/controllers/InputController";
 import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "@/api/functions/auth";
 import { signInSchema, type signInSchemaType } from "@/zod/authSchemas";
 import { useAppDispatch } from "@/redux/store";
 import { handleApiErrors } from "@/api/functions/validation";
-
-const fields = [
-  {
-    name: "email",
-    type: "text",
-    label: "Email Address",
-    placeholder: "name@example.com",
-  },
-  {
-    name: "password",
-    type: "password",
-    label: "Password",
-    placeholder: "Enter your password",
-    link: {
-      label: "Forgot password?",
-      path: "/forgot-password",
-    },
-  },
-] as const;
+import AuthShell from "./AuthShell";
+import { AuthDivider, PasswordField, TextField } from "./AuthFields";
 
 export default function SignIn() {
+  const [showPassword, setShowPassword] = useState(false);
   const disp = useAppDispatch();
   const form = useForm<signInSchemaType>({
     defaultValues: {
@@ -47,29 +31,69 @@ export default function SignIn() {
   });
 
   return (
-    <AuthCard
-      title="Welcome back"
-      subtitle="Sign in to continue collaborating."
+    <AuthShell
+      title="Connexion"
+      subtitle="Bienvenue ! Connectez-vous à votre espace CoLab."
       footer={
         <>
-          New here?{" "}
-          <Link to="/sign-up" className="text-primary hover:underline">
-            Create an account
+          Pas encore de compte ?{" "}
+          <Link to="/sign-up" className="font-medium text-[#3B5BDB] hover:underline">
+            Créer un compte
           </Link>
         </>
       }
     >
       <form
         onSubmit={form.handleSubmit((data) => signInMutation(data))}
-        className="space-y-4"
+        className="space-y-5"
       >
-        {fields.map((f, i) => (
-          <InputController key={i} control={form.control} f={f} />
-        ))}
-        <Button type="submit" className="w-full" disabled={isSignInPending}>
-          {isSignInPending ? "Signing in…" : "Sign in"}
+        <TextField
+          control={form.control}
+          name="email"
+          label="Adresse e-mail"
+          placeholder="votre@email.com"
+          icon={<Mail className="h-4 w-4" />}
+          autoComplete="email"
+        />
+
+        <PasswordField
+          control={form.control}
+          name="password"
+          label="Mot de passe"
+          placeholder="Votre mot de passe"
+          icon={<Lock className="h-4 w-4" />}
+          autoComplete="current-password"
+          visible={showPassword}
+          onToggle={() => setShowPassword((value) => !value)}
+        />
+
+        <div className="flex items-center justify-between gap-4 pt-1">
+          <label className="flex items-center gap-3 text-sm text-slate-600">
+            <input
+              type="checkbox"
+              className="h-4 w-4 rounded accent-[#3B5BDB]"
+            />
+            <span>Se souvenir de moi</span>
+          </label>
+
+          <Link
+            to="/forgot-password"
+            className="text-sm font-medium text-[#3B5BDB] hover:underline"
+          >
+            Mot de passe oublié ?
+          </Link>
+        </div>
+
+        <Button
+          type="submit"
+          className="h-12 w-full rounded-xl bg-[#3B5BDB] text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-[#2F4AC2]"
+          disabled={isSignInPending}
+        >
+          {isSignInPending ? "Connexion..." : "Se connecter"}
         </Button>
+
+        <AuthDivider />
       </form>
-    </AuthCard>
+    </AuthShell>
   );
 }

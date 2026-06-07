@@ -1,47 +1,25 @@
 import { Link } from "react-router-dom";
-import AuthCard from "@/components/cards/AuthCard";
+import { Mail, User, Lock } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import InputController from "@/components/controllers/InputController";
 import { useForm } from "react-hook-form";
-import CheckBoxController from "@/components/controllers/CheckBoxController";
 import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signUp } from "@/api/functions/auth";
 import { signUpSchema, type signUpSchemaType } from "@/zod/authSchemas";
 import { useAppDispatch } from "@/redux/store";
 import { handleApiErrors } from "@/api/functions/validation";
-
-const infoFields = [
-  {
-    name: "full_name",
-    type: "text",
-    label: "Full Name",
-    placeholder: "Alex Johnson",
-  },
-  {
-    name: "email",
-    type: "text",
-    label: "Email Address",
-    placeholder: "alex@example.com",
-  },
-] as const;
-
-const passwordFields = [
-  {
-    name: "password",
-    type: "password",
-    label: "New Password",
-    placeholder: "Minimum 6 characters",
-  },
-  {
-    name: "password_confirmation",
-    type: "password",
-    label: "Confirm Password",
-    placeholder: "Re-enter new password",
-  },
-] as const;
+import AuthShell from "./AuthShell";
+import {
+  AuthDivider,
+  CheckboxField,
+  PasswordField,
+  TextField,
+} from "./AuthFields";
 
 export default function SignUp() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const disp = useAppDispatch();
   const form = useForm<signUpSchemaType>({
     defaultValues: {
@@ -62,41 +40,84 @@ export default function SignUp() {
   });
 
   return (
-    <AuthCard
-      title="Create your account"
-      subtitle="Start sharing ideas and building teams."
+    <AuthShell
+      title="Créer un compte"
+      subtitle="Rejoignez CoLab et commencez à collaborer."
       footer={
         <>
-          Already have an account?{" "}
-          <Link to="/sign-in" className="text-primary hover:underline">
-            Sign in
+          Vous avez déjà un compte ?{" "}
+          <Link to="/sign-in" className="font-medium text-[#3B5BDB] hover:underline">
+            Se connecter
           </Link>
         </>
       }
     >
       <form
         onSubmit={form.handleSubmit((data) => signUpMutation(data))}
-        className="space-y-4"
+        className="space-y-5"
       >
-        {infoFields.map((f, i) => (
-          <InputController key={i} control={form.control} f={f} />
-        ))}
-
-        <div className="grid grid-cols-2 gap-3">
-          {passwordFields.map((f, i) => (
-            <InputController key={i} control={form.control} f={f} />
-          ))}
-        </div>
-        <CheckBoxController
+        <TextField
           control={form.control}
-          f={{
-            name: "terms",
-          }}
+          name="full_name"
+          label="Nom complet"
+          placeholder="Votre nom complet"
+          icon={<User className="h-4 w-4" />}
+          autoComplete="name"
         />
-        <Button type="submit" className="w-full" disabled={isSignUpPending}>
-          {isSignUpPending ? "Creating account…" : "Create account"}
+
+        <TextField
+          control={form.control}
+          name="email"
+          label="Adresse e-mail"
+          placeholder="votre@email.com"
+          icon={<Mail className="h-4 w-4" />}
+          autoComplete="email"
+        />
+
+        <PasswordField
+          control={form.control}
+          name="password"
+          label="Mot de passe"
+          placeholder="Créez un mot de passe"
+          icon={<Lock className="h-4 w-4" />}
+          autoComplete="new-password"
+          helperText="Au moins 6 caractères."
+          visible={showPassword}
+          onToggle={() => setShowPassword((value) => !value)}
+        />
+
+        <PasswordField
+          control={form.control}
+          name="password_confirmation"
+          label="Confirmer le mot de passe"
+          placeholder="Confirmez votre mot de passe"
+          icon={<Lock className="h-4 w-4" />}
+          autoComplete="new-password"
+          visible={showConfirmation}
+          onToggle={() => setShowConfirmation((value) => !value)}
+        />
+
+        <CheckboxField control={form.control} name="terms">
+          J&apos;accepte les{" "}
+          <a href="#" className="font-medium text-[#3B5BDB] hover:underline">
+            Conditions d&apos;utilisation
+          </a>{" "}
+          et la{" "}
+          <a href="#" className="font-medium text-[#3B5BDB] hover:underline">
+            Politique de confidentialité
+          </a>
+        </CheckboxField>
+
+        <Button
+          type="submit"
+          className="h-12 w-full rounded-xl bg-[#3B5BDB] text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-[#2F4AC2]"
+          disabled={isSignUpPending}
+        >
+          {isSignUpPending ? "Création..." : "Créer mon compte"}
         </Button>
+
+        <AuthDivider />
       </form>
-    </AuthCard>
+    </AuthShell>
   );
 }

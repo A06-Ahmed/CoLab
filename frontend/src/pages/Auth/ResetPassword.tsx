@@ -1,34 +1,23 @@
-import AuthCard from "@/components/cards/AuthCard";
+import AuthShell from "./AuthShell";
 import { Button } from "@/components/ui/button";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import InputController from "@/components/controllers/InputController";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
+import { Lock } from "lucide-react";
 import {
   resetPasswordSchema,
   type resetPasswordSchemaType,
 } from "@/zod/authSchemas";
-import { useMutation } from "@tanstack/react-query";
 import { resetUserPassword } from "@/api/functions/auth";
 import { handleApiErrors } from "@/api/functions/validation";
 import { useAppDispatch } from "@/redux/store";
-
-const fields = [
-  {
-    name: "password",
-    type: "password",
-    label: "New Password",
-    placeholder: "Minimum 6 characters",
-  },
-  {
-    name: "password_confirmation",
-    type: "password",
-    label: "Confirm Password",
-    placeholder: "Re-enter new password",
-  },
-] as const;
+import { AuthDivider, PasswordField } from "./AuthFields";
 
 export default function ResetPassword() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const nav = useNavigate();
   const disp = useAppDispatch();
   const userEmail = localStorage.getItem("user-email");
@@ -58,33 +47,55 @@ export default function ResetPassword() {
   });
 
   if (!userEmail || !userCode) return <Navigate to={"/"} replace />;
+
   return (
-    <AuthCard
-      title="Set a new password"
-      subtitle="Make it strong and memorable."
+    <AuthShell
+      title="Réinitialiser le mot de passe"
+      subtitle="Créez un nouveau mot de passe sécurisé."
       footer={
-        <Link to="/sign-in" className="text-primary hover:underline">
-          Back to sign in
+        <Link to="/sign-in" className="font-medium text-[#3B5BDB] hover:underline">
+          Retour à la connexion
         </Link>
       }
     >
       <form
         onSubmit={form.handleSubmit((data) => resetUserPasswordMutation(data))}
-        className="space-y-4"
+        className="space-y-5"
       >
-        {fields.map((f, i) => (
-          <InputController key={i} control={form.control} f={f} />
-        ))}
+        <PasswordField
+          control={form.control}
+          name="password"
+          label="Nouveau mot de passe"
+          placeholder="Créez un nouveau mot de passe"
+          icon={<Lock className="h-4 w-4" />}
+          autoComplete="new-password"
+          visible={showPassword}
+          onToggle={() => setShowPassword((value) => !value)}
+        />
+
+        <PasswordField
+          control={form.control}
+          name="password_confirmation"
+          label="Confirmer le mot de passe"
+          placeholder="Confirmez votre mot de passe"
+          icon={<Lock className="h-4 w-4" />}
+          autoComplete="new-password"
+          visible={showConfirmation}
+          onToggle={() => setShowConfirmation((value) => !value)}
+        />
+
         <Button
           type="submit"
-          className="w-full"
+          className="h-12 w-full rounded-xl bg-[#3B5BDB] text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-[#2F4AC2]"
           disabled={isResetUserPasswordPending}
         >
           {isResetUserPasswordPending
-            ? "Resetting password..."
-            : "Reset password"}
+            ? "Réinitialisation..."
+            : "Réinitialiser le mot de passe"}
         </Button>
+
+        <AuthDivider />
       </form>
-    </AuthCard>
+    </AuthShell>
   );
 }
