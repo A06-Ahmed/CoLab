@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
+import { getStorageUrl } from "@/lib/runtimeUrls";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -19,8 +20,7 @@ const getImageUrl = (path: string | undefined) => {
   if (!path) return "";
   if (path?.startsWith("blob:http:")) return path;
 
-  const baseURL = import.meta.env.VITE_API_URL;
-  return `${baseURL}/storage/${path}`;
+  return getStorageUrl(path);
 };
 
 function formatTime(created_at: string) {

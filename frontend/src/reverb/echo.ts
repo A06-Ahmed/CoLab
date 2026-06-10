@@ -1,6 +1,10 @@
 import { store } from "@/redux/store";
 import Echo from "laravel-echo";
 import Pusher from "pusher-js";
+import {
+  getBroadcastAuthUrl,
+  getReverbConfig,
+} from "@/lib/runtimeUrls";
 
 declare global {
   interface Window {
@@ -10,15 +14,18 @@ declare global {
 
 window.Pusher = Pusher;
 
+const { host, key, port, scheme } = getReverbConfig();
+
 const echo = new Echo({
   broadcaster: "reverb",
-  key: "ux28spdz7jpctot2wyxp",
-  wsHost: "127.0.0.1",
-  wsPort: 8080,
-  forceTLS: false,
-  enabledTransports: ["ws"],
+  key,
+  wsHost: host,
+  wsPort: port,
+  wssPort: port,
+  forceTLS: scheme === "https",
+  enabledTransports: ["ws", "wss"],
 
-  authEndpoint: "http://127.0.0.1:8000/api/broadcasting/auth",
+  authEndpoint: getBroadcastAuthUrl(),
 
   auth: {
     headers: {

@@ -15,6 +15,7 @@ import {
 import { setValue, toggleModal } from "@/redux/modalSlice";
 import { Button } from "../ui/button";
 import { setReply } from "@/redux/replySlice";
+import { getApiDownloadUrl } from "@/lib/runtimeUrls";
 
 export default function MessageCard({
   message,
@@ -81,7 +82,9 @@ export default function MessageCard({
   const handleDownload = (filePath: string) => {
     const fileName = filePath.split("/").pop();
 
-    window.open(`http://localhost:8000/api/download/${fileName}`, "_blank");
+    if (!fileName) return;
+
+    window.open(getApiDownloadUrl(fileName), "_blank");
   };
 
   const handleReply = () => {

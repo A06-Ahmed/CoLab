@@ -1,13 +1,14 @@
 import { store } from "@/redux/store";
 import axios from "axios";
+import { getApiBaseUrl } from "@/lib/runtimeUrls";
 
 const api = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}/api/`,  // This assumes VITE_API_URL doesn't include /api
+  baseURL: `${getApiBaseUrl()}/api`,
   withCredentials: true,
   headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  }
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  },
 });
 
 api.interceptors.request.use(
