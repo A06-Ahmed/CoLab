@@ -1,4 +1,4 @@
-import { InboxIcon } from "lucide-react";
+
 import SentRequestCardSkeleton from "../skeletons/SentRequestCardSkeleton";
 import ProjectSentRequestCard from "../cards/ProjectSentRequestCard";
 import UserSentRequestCard from "../cards/UserSentRequestCard";

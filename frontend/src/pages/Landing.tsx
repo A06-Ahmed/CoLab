@@ -274,8 +274,8 @@ function HeroImageComposition() {
       <div className="absolute right-[9%] top-[18%] h-36 w-36 rounded-full bg-violet-200/45 blur-3xl" />
 
       <motion.div
-        animate={ANIMATION_CONFIG.float.animate}
-        transition={ANIMATION_CONFIG.float.transition}
+        animate={{ y: [0, -6, 0] }}
+        transition={{ repeat: Infinity, duration: 4, ease: "easeInOut", repeatType: "loop" }}
         className="relative mx-auto w-full max-w-105 rounded-[42px] bg-white/72 p-3 shadow-[0_30px_80px_rgba(67,97,238,0.18)] backdrop-blur-sm overflow-visible"
       >
         <img
