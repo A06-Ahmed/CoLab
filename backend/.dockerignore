@@ -1,0 +1,21 @@
+echo "public/storage" > .dockerignore
+
+public/storage
+.env
+.git
+.gitignore
+node_modules
+tests
+storage/logs/*.log
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/testing/*
+storage/framework/views/*
+.phpunit.cache
+.phpunit.result.cache
+*.log
+.DS_Store
+.idea
+vite.config.js
+package.json
+package-lock.json
