@@ -54,6 +54,6 @@ RUN chmod -R 775 /var/www/storage /var/www/bootstrap/cache || true
 # Clear config cache
 RUN php artisan config:clear || true
 
-EXPOSE 8000
+EXPOSE 8080
 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"]
